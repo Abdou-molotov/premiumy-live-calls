@@ -82,7 +82,7 @@
             <!-- Data will be inserted here -->
         </tbody>
     </table>
-    <button id="notifyBtn" onclick="requestNotificationPermission()">Enable Notifications</button>
+    <audio id="notificationSound" src="{{ url_for('static', filename='notification.mp3') }}" preload="auto"></audio>
     <script>
         let previousDataKeys = new Set();
         let totalResponsesCount = 0;
@@ -117,35 +117,24 @@
                 document.getElementById('totalResponsesCount').textContent = totalResponsesCount;
 
                 if (newCalls.length > 0) {
-                    showNotification();
+                    playNotificationSound();
                 }
             } catch (error) {
                 console.error('Error fetching live calls:', error);
             }
         }
 
-        function showNotification() {
-            if (Notification.permission === 'granted') {
-                new Notification('New Calls Received', {
-                    body: 'You have new calls in the system.'
-                });
-            }
-        }
-
-        function requestNotificationPermission() {
-            if (!('Notification' in window)) {
-                alert('Notifications not supported on this browser.');
-            } else if (Notification.permission !== 'denied') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        console.log('Notification permission granted.');
-                    }
-                });
-            }
+        function playNotificationSound() {
+            const sound = document.getElementById('notificationSound');
+            sound.play().then(() => {
+                console.log('Notification sound played for new calls');
+            }).catch(error => {
+                console.error('Error playing notification sound for new calls:', error);
+            });
         }
 
         // Fetch data every 5 seconds
-        setInterval(fetchLiveCalls, 200);
+        setInterval(fetchLiveCalls, 500);
         // Initial fetch
         fetchLiveCalls();
     </script>
